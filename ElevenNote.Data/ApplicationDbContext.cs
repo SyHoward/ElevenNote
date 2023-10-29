@@ -9,11 +9,17 @@ public class ApplicationDbContext : IdentityDbContext<UserEntity, IdentityRole<i
 {
     public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options)
         : base(options) {}
+    
+    public DbSet<NoteEntity> Notes {get; set;} = null!;
 
-    protected override void OnModelCreating(ModelBuilder modelbuilder)
+    protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
-        base.OnModelCreating(modelbuilder);
+        base.OnModelCreating(modelBuilder);
 
-        modelbuilder.Entity<UserEntity>().ToTable("Users");
+        modelBuilder.Entity<UserEntity>().ToTable("Users");
+        modelBuilder.Entity<NoteEntity>()
+            .HasOne(n => n.Owner)
+            .WithMany(u => u.Notes)
+            .HasForeignKey(n => n.OwnerId);
     }
 }
