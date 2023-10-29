@@ -1,9 +1,9 @@
 using ElevenNote.Models.Responses;
 using ElevenNote.Models.User;
 using ElevenNote.Services.User;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using NuGet.Protocol.Core.Types;
-
 namespace ElevenNote.WebAPI.Controllers;
 
 [Route("api/[controller]")]
@@ -34,6 +34,7 @@ public class UserController : ControllerBase
         return BadRequest(new TextResponse("User could not be registered."));
     }
 
+    [Authorize]
     [HttpGet("{userId:int}")]
     public async Task<IActionResult> GetById([FromRoute] int userId)
     {
