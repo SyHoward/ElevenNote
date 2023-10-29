@@ -1,15 +1,11 @@
-using System.Diagnostics;
 using System.IdentityModel.Tokens.Jwt;
-using System.Reflection.Metadata.Ecma335;
 using System.Security.Claims;
-using System.Security.Principal;
 using System.Text;
 using ElevenNote.Data.Entities;
 using ElevenNote.Models.Token;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
-using Microsoft.VisualBasic;
 
 namespace ElevenNote.Services.Token;
 
@@ -23,6 +19,7 @@ public class TokenService : ITokenService
         _configuration = configuration;
         _userManager = userManager;
     }
+
     public async Task<TokenResponse?> GetTokenAsync(TokenRequest model)
     {
         UserEntity? entity = await GetValidUserAsync(model);
@@ -55,12 +52,14 @@ public class TokenService : ITokenService
         var tokenHandler = new JwtSecurityTokenHandler();
 
         var token = tokenHandler.CreateToken(tokenDescriptor);
+
         TokenResponse response = new()
         {
             Token = tokenHandler.WriteToken(token),
             IssuedAt = token.ValidFrom,
             Expires = token.ValidTo
         };
+
         return response;
     }
 
@@ -74,13 +73,16 @@ public class TokenService : ITokenService
         };
 
 
+
         var roles = await _userManager.GetRolesAsync(entity);
         foreach (var role in roles)
         {
             claims.Add(new Claim(ClaimTypes.Role, role));
         }
+
         return claims;
     }
+    
     private SecurityTokenDescriptor GetSecurityTokenDescriptor(List<Claim> claims)
     {
         var key = Encoding.UTF8.GetBytes(_configuration["Jwt:Key"]!);
