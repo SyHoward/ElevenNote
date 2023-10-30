@@ -82,4 +82,22 @@ public class NoteService : INoteService
             ModifiedUtc = entity.ModifiedUtc
         };
     }
+
+    public async Task<bool> UpdateNoteAsync(NoteUpdate request)
+    {
+        NoteEntity? entity = await _dbContext.Notes.FindAsync(request.Id);
+
+        if (entity?.OwnerId != _userId)
+            return false;
+
+        entity.Title = request.Title;
+        entity.Content = request.Content;
+        entity.ModifiedUtc = DateTimeOffset.Now;
+
+        // Save the changes to the database and capture how many rows were updated
+        int numberOfChanges = await _dbContext.SaveChangesAsync();
+
+        // numberOfChanges is stated to be equal to 1 because only one row is updated
+        return numberOfChanges == 1;
+    }
 }
